@@ -124,6 +124,7 @@ h1,.logo,#grab h2{font-weight:800;letter-spacing:-.03em}
 .tabs button{position:relative;flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:9px 0;transition:color .2s}
 .tabs button.on{color:#fff}
 .hint{display:none}
+#note{margin:6px 16px 0;font-size:12px;font-weight:600;color:var(--mute);text-align:center}
 .dots{display:none;justify-content:center;gap:8px;padding:14px 0 4px}
 .dots b{width:8px;height:8px;border-radius:99px;background:var(--fill);transition:width .3s,background .3s}
 .dots b.on{width:26px;background:var(--lc)}
@@ -171,6 +172,7 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 <button id="cfg" aria-label="Change line, direction or station"></button>
 <div class="row"><input id="q" inputmode="numeric" autocomplete="off" placeholder="Jump to run no." aria-label="Jump to run number"><button id="flip" aria-label="Switch direction"></button></div>
 <div class="tabs" id="tabs"><i></i><button data-t="-1">Upcoming</button><button data-t="0">Now</button><button data-t="1">Passed</button></div>
+<div id="note" hidden>Timetable may be out of date</div>
 <div class="wheel"><div class="strip" id="strip"></div></div>
 <div id="scrim"></div>
 <div id="sheet"><div id="grab"><i></i><b id="ttl"></b></div><div id="body"></div></div>
@@ -183,13 +185,16 @@ try { st = JSON.parse(localStorage.getItem("trn3") || "{}"); } catch (e) {}
 if (!st || typeof st !== "object") st = {};
 const hm = s => { s = ((s / 60 % 1440) + 1440) % 1440 | 0; return String(s / 60 | 0).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
 const sgt = () => Object.fromEntries(new Intl.DateTimeFormat("en-CA", {timeZone: "Asia/Singapore", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"}).formatToParts(new Date()).map(x => [x.type, x.value]));
+let stale = false;
+// shortcut: once the date is past every service's end the weekday/PH patterns keep repeating (specials excluded); upgrade = regenerate schedule.json
 function active(ds, dow) {
-  const a = new Set();
-  for (const id in S.services) { const v = S.services[id]; if (v.days[dow] && v.start <= ds && ds <= v.end) a.add(id); }
+  const a = new Set(), late = ds > Math.max(...Object.values(S.services).map(v => v.end)); if (late) stale = true;
+  for (const id in S.services) { const v = S.services[id]; if (v.days[dow] && v.start <= ds && (ds <= v.end || late && !/SPECIAL/.test(id))) a.add(id); }
   for (const [id, d, t] of S.exceptions) if (d === ds) t === 1 ? a.add(id) : a.delete(id);
   return a;
 }
 function days() {
+  stale = false;
   const p = sgt(), day = Date.UTC(p.year, p.month - 1, p.day), secs = p.hour * 3600 + p.minute * 60 + +p.second;
   return [0, 1].map(k => { const d = new Date(day - k * 864e5);
     return {k, now: secs + 86400 * k, act: active(d.toISOString().slice(0, 10).replaceAll("-", ""), (d.getUTCDay() + 6) % 7)}; });
@@ -227,7 +232,7 @@ function render() {
   $("cfg").innerHTML = `${cap(st.stn)}<span><b>${nm(st.stn)}</b><small>${st.line === "CCL" ? dlab(st.line, st.dir) : nm(long.stops[0][0]) + " → " + nm(long.stops.at(-1)[0])}</small><u>${LN[st.line]}</u></span><em>⌄</em>`;
   [...$("dots").children].forEach((d, i) => d.classList.toggle("on", i + 1 === step));
   $("start").dataset.step = step;$("start").classList.toggle("hide", step === "app");
-  const ds = days(), secs = ds[0].now, occ = [];
+  const ds = days(), secs = ds[0].now, occ = []; $("note").hidden = !stale;
   for (const {k, act} of ds) for (const t of trips) if (act.has(t.service)) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) occ.push({t, at: t.stops[i][2] - 86400 * k, i, id: t.id + "|" + k}); }
   occ.sort((a, b) => a.at - b.at);
   let c = pin ? occ.findIndex(o => o.id === pin) : -1;
@@ -241,6 +246,12 @@ function render() {
   if (b) strip.scrollLeft = b.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2;
   upd(); try { localStorage.setItem("trn3", JSON.stringify(st)); } catch (e) {}
 }
+// keep times fresh: every 30 s and on returning to the tab, unless mid-gesture (act), in setup, or hidden; the centred run stays centred
+let act = 0;
+function refresh() { const sp = $("strip"); if (!S || step !== "app" || document.hidden || Date.now() - act < 5000) return;
+  const p = pin; if (cur >= 0 && (cur !== sp._now || document.body.classList.contains("open"))) pin = sp._o[cur].id; render(); pin = p; }
+setInterval(refresh, 30000); document.addEventListener("visibilitychange", refresh);
+$("body").addEventListener("scroll", () => act = Date.now());
 // continuous fisheye: size and fade follow distance from the centre
 let quiet = 0;
 function upd(user) {
@@ -300,15 +311,15 @@ function sheet(open, dy = 0, drag = false) {
 }
 { let y0 = null, dy = 0; const h = $("grab");
   let sc = null; const pc = e => { try { h.setPointerCapture(e.pointerId); } catch (_) {} };
-  h.onpointerdown = e => { if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; pc(e); return; } y0 = e.clientY; dy = 0; pc(e); };
+  h.onpointerdown = e => { act = Date.now(); if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; pc(e); return; } y0 = e.clientY; dy = 0; pc(e); };
   const big = b => { $("sheet").style.height = b ? "85dvh" : ""; $("sheet")._b = b; };
-  h.onpointermove = e => { if (sc) { sc[0].scrollTop += sc[1] - e.clientY; sc[1] = e.clientY; return; } if (y0 == null) return; dy = e.clientY - y0; if (dy > 0 && !$("sheet")._b) sheet(true, dy, true); };
+  h.onpointermove = e => { act = Date.now(); if (sc) { sc[0].scrollTop += sc[1] - e.clientY; sc[1] = e.clientY; return; } if (y0 == null) return; dy = e.clientY - y0; if (dy > 0 && !$("sheet")._b) sheet(true, dy, true); };
   h.onpointerup = () => { if (sc) { sc = null; return; } if (y0 == null) return; y0 = null;
     if (dy < -40) big(true); else if ($("sheet")._b) { if (dy > 60) big(false); } else sheet(dy < 90, 0); if (!$("sheet")._b && dy >= 90) big(false); };
   $("scrim").onclick = () => sheet(false); }
 // mouse wheel / trackpad: vertical wheel scrolls the horizontal strip
 $("strip").addEventListener("wheel", e => { if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; e.preventDefault(); $("strip").scrollBy({left: e.deltaY, behavior: "auto"}); }, {passive: false});
-$("strip").onscroll =() => { if (Date.now() < quiet) quiet = Date.now() + 600; requestAnimationFrame(() => upd(true)); }; // programmatic scrolls (render, tabs) stay quiet until they settle
+$("strip").onscroll =() => { act = Date.now(); if (Date.now() < quiet) quiet = Date.now() + 600; requestAnimationFrame(() => upd(true)); }; // programmatic scrolls (render, tabs) stay quiet until they settle
 $("strip").onclick = e => { const b = e.target.closest("button"); if (!b) return;
   if (+b.dataset.i === cur) sheet(true); else b.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
 $("tabs").onclick = e => { const b = e.target.closest("button"), sp = $("strip"); if (!b) return;
@@ -332,14 +343,15 @@ $("start").addEventListener("click", e => { const b = e.target.closest("[data-ba
 $("ln").addEventListener("click", e => { if (e.target.closest("button")) { step = 2; render(); } });
 $("dr").addEventListener("click", e => { if (e.target.closest("button")) { step = 3; render(); const b = $("stl").querySelector(".on"); if (b) $("stl").scrollTop = b.offsetTop - 160; } });
 $("q").oninput = () => { const q = $("q").value.trim().replace(/^0+(?=\d)/, "").toUpperCase(); if (!S) return; if (!q) { $("q").style.outline = ""; return; }
-  const t = S.trips.find(t => t.line === st.line && t.dir === st.dir && String(t.trn).toUpperCase() === q && t.stops.some(x => x[0] === st.stn)); $("q").style.outline = t ? "" : "2px solid #e5484d"; if (!t) return;
-  const k = days().findIndex(d => d.act.has(t.service)); if (k < 0) { $("q").style.outline = "2px solid #e5484d"; return; } // not running in the days shown
-  pin = t.id + "|" + Math.max(k, 0); render(); };
+  const ds = days(), c = []; // every pass of this run at the station in the days shown; jump to the next one, else the latest
+  for (const t of S.trips) if (t.line === st.line && t.dir === st.dir && String(t.trn).toUpperCase() === q) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) for (const d of ds) if (d.act.has(t.service)) c.push({id: t.id + "|" + d.k, at: t.stops[i][2] - 86400 * d.k}); }
+  $("q").style.outline = c.length ? "" : "2px solid #e5484d"; if (!c.length) return;
+  c.sort((a, b) => a.at - b.at); pin = (c.find(o => o.at >= ds[0].now) || c.at(-1)).id; render(); };
 (async () => {
   try { [S, N] = await Promise.all(["schedule.json", "names.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }))); }
-  catch (e) { $("start").innerHTML = `<p class="empty">Couldn't load data (${e.message}).</p>`; return; }
-  render();
-  setTimeout(() => { step = st.ok ? "app" : 1; render(); }, 1000); // splash
+  catch (e) { $("start").innerHTML = `<p class="empty">Couldn't load data (${e.message}).</p><button class="more" style="margin:0 16px;width:auto" onclick="location.reload()">Retry</button>`; return; }
+  step = st.ok ? "app" : 0; render();
+  if (!st.ok) setTimeout(() => { step = 1; render(); }, 1000); // splash on first run only
 })();
 </script>
 </body>
