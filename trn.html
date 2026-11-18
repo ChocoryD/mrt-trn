@@ -54,7 +54,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta 
 .stl{position:relative}
 #start .go{margin:12px 16px 0;width:auto}
 .hint{display:flex;justify-content:space-between;margin:16px 20px 0;font-size:12px;color:var(--mute);font-weight:600;text-transform:uppercase}
-.wheel{position:relative;flex:none;margin-top:4px}
+.wheel{position:relative;z-index:3;flex:none;margin-top:4px}
 .strip{position:relative;display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:40px calc(50% - 48px) 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .strip::-webkit-scrollbar{display:none}
 .strip button{flex:none;width:96px;height:96px;scroll-snap-align:center;border:0;border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:center;transform-origin:center}
@@ -67,7 +67,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta 
 .s{display:flex;gap:14px;padding:8px 0;font-size:17px}.s time{width:50px;color:var(--mute);flex:none}
 .s.at{color:var(--lc);font-weight:700}.s.at time{color:var(--lc)}
 .more{display:block;width:100%;margin-top:18px;height:48px;border:0;border-radius:24px;background:var(--lc);color:#fff;font:inherit;font-weight:700}
-#scrim{position:fixed;inset:0;background:#12141c;opacity:0;pointer-events:none;z-index:5}
+#scrim{position:fixed;inset:0;background:#12141c;opacity:0;pointer-events:none;z-index:2}body.open #scrim{pointer-events:auto}
+/* open: wheel (z3) and tabs (z4) sit above the scrim; the wheel's empty area passes taps through to it */
+body.open .wheel{pointer-events:none}body.open .strip button{pointer-events:auto}
 #sheet{position:fixed;left:0;right:0;bottom:0;height:42dvh;background:var(--card);border-radius:18px 18px 0 0;z-index:6;transform:translateY(105%);display:flex;flex-direction:column}
 #grab{touch-action:none;padding:10px 20px 12px;text-align:center;cursor:grab}
 #grab i{display:block;width:52px;height:6px;border-radius:3px;background:var(--mute);opacity:.5;margin:0 auto 10px}
@@ -117,7 +119,7 @@ h1,.logo,#grab h2{font-weight:800;letter-spacing:-.03em}
 .row{margin-right:16px}.row input{width:100%;min-width:0}
 #flip{flex:none;max-width:55%;height:52px;border:0;border-radius:24px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;white-space:nowrap;box-shadow:inset 0 0 0 2px var(--lc)}
 #flip span{overflow:hidden;text-overflow:ellipsis}#flip:active{transform:scale(.97)}
-.tabs{position:relative;display:flex;margin:22px 16px 0;padding:3px;background:var(--fill);border-radius:99px}
+.tabs{position:relative;z-index:4;display:flex;margin:22px 16px 0;padding:3px;background:var(--fill);border-radius:99px}
 .tabs i{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/3);border-radius:99px;background:var(--lc);transition:transform .35s cubic-bezier(.215,.61,.355,1)}
 .tabs button{position:relative;flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:9px 0;transition:color .2s}
 .tabs button.on{color:#fff}
@@ -293,12 +295,12 @@ function sheet(open, dy = 0, drag = false) {
   s.style.transition = drag ? "none" : open ? "transform .4s cubic-bezier(.215,.61,.355,1)" : "transform .6s cubic-bezier(.645,.045,.355,1)";
   s.style.transform = open ? `translateY(${dy}px)` : "translateY(105%)";
   const a = open ? Math.max(0, 1 - dy / s.offsetHeight) : 0;
-  sc.style.transition = drag ? "none" : "opacity .4s"; sc.style.opacity = .36 * a; sc.style.opacity = open ? .12 : 0;
+  sc.style.transition = drag ? "none" : "opacity .4s"; sc.style.opacity = drag ? .36 * a : open ? .12 : 0;
   if (open && !drag) { const at = $("body").querySelector(".at"); if (at) $("body").scrollTop = at.offsetTop - 120; }
 }
 { let y0 = null, dy = 0; const h = $("grab");
-  let sc = null;
-  h.onpointerdown = e => { if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; h.setPointerCapture(e.pointerId); return; } y0 = e.clientY; dy = 0; h.setPointerCapture(e.pointerId); };
+  let sc = null; const pc = e => { try { h.setPointerCapture(e.pointerId); } catch (_) {} };
+  h.onpointerdown = e => { if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; pc(e); return; } y0 = e.clientY; dy = 0; pc(e); };
   const big = b => { $("sheet").style.height = b ? "85dvh" : ""; $("sheet")._b = b; };
   h.onpointermove = e => { if (sc) { sc[0].scrollTop += sc[1] - e.clientY; sc[1] = e.clientY; return; } if (y0 == null) return; dy = e.clientY - y0; if (dy > 0 && !$("sheet")._b) sheet(true, dy, true); };
   h.onpointerup = () => { if (sc) { sc = null; return; } if (y0 == null) return; y0 = null;
@@ -306,10 +308,11 @@ function sheet(open, dy = 0, drag = false) {
   $("scrim").onclick = () => sheet(false); }
 // mouse wheel / trackpad: vertical wheel scrolls the horizontal strip
 $("strip").addEventListener("wheel", e => { if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; e.preventDefault(); $("strip").scrollBy({left: e.deltaY, behavior: "auto"}); }, {passive: false});
-$("strip").onscroll =() => requestAnimationFrame(() => upd(true));
+$("strip").onscroll =() => { if (Date.now() < quiet) quiet = Date.now() + 600; requestAnimationFrame(() => upd(true)); }; // programmatic scrolls (render, tabs) stay quiet until they settle
 $("strip").onclick = e => { const b = e.target.closest("button"); if (!b) return;
   if (+b.dataset.i === cur) sheet(true); else b.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
 $("tabs").onclick = e => { const b = e.target.closest("button"), sp = $("strip"); if (!b) return;
+  quiet = Date.now() + 1000; if (document.body.classList.contains("open")) sheet(false); // a tab-driven scroll must not pop the sheet
   if (pin) { pin = null; render(); } // pinned far-away run: re-centre on now first
   if (sp._now < 0) return;
   const t = sp.children[Math.min(Math.max(sp._now + +b.dataset.t, 0), sp.children.length - 1)]; if (t) t.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
