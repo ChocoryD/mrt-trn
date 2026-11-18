@@ -24,11 +24,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta 
 .top .on{opacity:1;transform:scale(1.1)}
 .seg{display:flex;background:var(--fill);border-radius:10px;padding:2px;margin:0 16px 8px}
 .seg button{flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:14px;font-weight:600;padding:8px 4px;border-radius:8px}
-.seg .on{background:var(--lc);color:#fff}
+.seg .on{background:var(--lc);color:var(--on-lc,#fff)}
 .row{display:flex;gap:8px;margin:14px 16px 0}
 .row input{height:52px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:inherit;font-size:16px;padding:0 12px;width:96px;font-weight:700;text-align:center}
 #cfg{flex:1;min-width:0;height:52px;display:flex;align-items:center;gap:12px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:inherit;padding:0 14px;text-align:left}
-#cfg i,.stl i{font-style:normal;font-weight:800;font-size:13px;background:var(--lc);color:#fff;border-radius:8px;padding:3px 7px;min-width:34px;text-align:center}
+#cfg i,.stl i{font-style:normal;font-weight:800;font-size:13px;background:var(--lc);color:var(--on-lc,#fff);border-radius:8px;padding:3px 7px;min-width:34px;text-align:center}
 #cfg span{flex:1;min-width:0;font-weight:700;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #cfg small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
 #cfg em{font-style:normal;color:var(--mute)}
@@ -54,7 +54,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta 
 .stl{position:relative}
 #start .go{margin:12px 16px 0;width:auto}
 .hint{display:flex;justify-content:space-between;margin:16px 20px 0;font-size:12px;color:var(--mute);font-weight:600;text-transform:uppercase}
-.wheel{position:relative;flex:none;margin-top:4px}
+.wheel{position:relative;z-index:3;flex:none;margin-top:4px}
 .strip{position:relative;display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:40px calc(50% - 48px) 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .strip::-webkit-scrollbar{display:none}
 .strip button{flex:none;width:96px;height:96px;scroll-snap-align:center;border:0;border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:center;transform-origin:center}
@@ -66,8 +66,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta 
 .info .p{display:inline-block;background:var(--fill);border-radius:99px;padding:4px 12px;font-size:15px;font-weight:600;margin-bottom:14px}
 .s{display:flex;gap:14px;padding:8px 0;font-size:17px}.s time{width:50px;color:var(--mute);flex:none}
 .s.at{color:var(--lc);font-weight:700}.s.at time{color:var(--lc)}
-.more{display:block;width:100%;margin-top:18px;height:48px;border:0;border-radius:24px;background:var(--lc);color:#fff;font:inherit;font-weight:700}
-#scrim{position:fixed;inset:0;background:#12141c;opacity:0;pointer-events:none;z-index:5}
+.more{display:block;width:100%;margin-top:18px;height:48px;border:0;border-radius:24px;background:var(--lc);color:var(--on-lc,#fff);font:inherit;font-weight:700}
+#scrim{position:fixed;inset:0;background:#12141c;opacity:0;pointer-events:none;z-index:2}body.open #scrim{pointer-events:auto}
+/* open: wheel (z3) and tabs (z4) sit above the scrim; the wheel's empty area passes taps through to it */
+body.open .wheel{pointer-events:none}body.open .strip button{pointer-events:auto}
 #sheet{position:fixed;left:0;right:0;bottom:0;height:42dvh;background:var(--card);border-radius:18px 18px 0 0;z-index:6;transform:translateY(105%);display:flex;flex-direction:column}
 #grab{touch-action:none;padding:10px 20px 12px;text-align:center;cursor:grab}
 #grab i{display:block;width:52px;height:6px;border-radius:3px;background:var(--mute);opacity:.5;margin:0 auto 10px}
@@ -91,13 +93,13 @@ h1,.logo,#grab h2{font-weight:800;letter-spacing:-.03em}
 .strip button{border-radius:26px;background:linear-gradient(180deg,color-mix(in srgb,var(--card) 100%,#fff 6%),var(--card))}
 #sheet{border-radius:28px 28px 0 0;box-shadow:0 0 0 1px var(--fill)}
 #grab h2{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
-.rt{font-size:14px;font-weight:800;letter-spacing:.02em;border-radius:99px;padding:4px 12px;color:#fff;background:var(--lc)}
+.rt{font-size:14px;font-weight:800;letter-spacing:.02em;border-radius:99px;padding:4px 12px;color:var(--on-lc,#fff);background:var(--lc)}
 .rt.kS,.rt.kP{background:var(--fill);color:var(--ink)}
 .ph div{display:grid;grid-template-columns:96px 1fr;gap:2px 10px;align-items:baseline;align-content:center;height:56px;box-sizing:border-box;scroll-snap-align:start;padding:0 12px;border-radius:12px;background:var(--fill);border-left:4px solid var(--mute)}
 .ph div.on{border-left-color:var(--lc);background:color-mix(in srgb,var(--lc) 18%,var(--fill))}.ph div.on b{color:var(--lc)}
 .ph time{font-size:13px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums;grid-row:span 2}
 .ph b{font-size:14px;font-weight:800;color:var(--ink)}
-.ph em{font-style:normal;font-size:11px;font-weight:800;margin-left:8px;padding:2px 8px;border-radius:99px;background:var(--lc);color:#fff;vertical-align:1px}
+.ph em{font-style:normal;font-size:12px;font-weight:800;margin-left:8px;padding:2px 8px;border-radius:99px;background:var(--lc);color:var(--on-lc,#fff);vertical-align:1px}
 .ph{height:56px;transition:height .3s cubic-bezier(.2,.8,.2,1);overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;margin:0}.ph::-webkit-scrollbar{display:none}
 .ph.x{scroll-snap-type:none}.phc{display:block;width:100%;border:0;background:none;font-family:inherit;cursor:pointer;margin:6px 0 10px;text-align:center;font-size:12px;font-weight:700;color:var(--mute)}
 .ph small{font-size:12px;font-weight:600;color:var(--mute)}
@@ -117,11 +119,12 @@ h1,.logo,#grab h2{font-weight:800;letter-spacing:-.03em}
 .row{margin-right:16px}.row input{width:100%;min-width:0}
 #flip{flex:none;max-width:55%;height:52px;border:0;border-radius:24px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;white-space:nowrap;box-shadow:inset 0 0 0 2px var(--lc)}
 #flip span{overflow:hidden;text-overflow:ellipsis}#flip:active{transform:scale(.97)}
-.tabs{position:relative;display:flex;margin:22px 16px 0;padding:3px;background:var(--fill);border-radius:99px}
+.tabs{position:relative;z-index:4;display:flex;margin:22px 16px 0;padding:3px;background:var(--fill);border-radius:99px}
 .tabs i{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/3);border-radius:99px;background:var(--lc);transition:transform .35s cubic-bezier(.215,.61,.355,1)}
 .tabs button{position:relative;flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:9px 0;transition:color .2s}
-.tabs button.on{color:#fff}
+.tabs button.on{color:var(--on-lc,#fff)}
 .hint{display:none}
+#note{margin:6px 16px 0;font-size:12px;font-weight:600;color:var(--mute);text-align:center}
 .dots{display:none;justify-content:center;gap:8px;padding:14px 0 4px}
 .dots b{width:8px;height:8px;border-radius:99px;background:var(--fill);transition:width .3s,background .3s}
 .dots b.on{width:26px;background:var(--lc)}
@@ -139,7 +142,7 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 /* setup screens */
 .stp{width:100%;max-width:520px;margin:0 auto}
 #start h1{font-size:32px;font-weight:800;letter-spacing:-.03em}
-#ln{display:flex;flex-direction:column;gap:8px;padding:0 16px;overflow-y:auto}
+#ln{display:flex;flex-direction:column;gap:8px;padding:0 16px;overflow-y:auto;scrollbar-gutter:stable both-edges}
 #start #ln button{height:auto;min-height:64px;flex:none;flex-direction:row;align-items:center;justify-content:flex-start;gap:16px;padding:10px 16px 10px 10px;border-radius:18px;background:var(--card);color:var(--ink);box-shadow:none;overflow:visible}
 #start #ln img{height:56px;flex:none}
 #start #ln b{flex:none;min-width:84px;padding:9px 0;border-radius:14px;background:var(--c);color:#fff;text-align:center;font-size:22px;font-weight:800;letter-spacing:-.01em}
@@ -150,7 +153,7 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 #dr b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em}#dr small{display:block;margin-top:6px;font-size:14px;font-weight:600;color:var(--mute)}
 #dr em{display:flex;align-items:center;gap:8px;margin-top:10px;font-style:normal}#dr s{text-decoration:none;color:var(--mute);font-weight:700}
 #dr button>i{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:20px;background:var(--fill)}
-#dr button.on{background:color-mix(in srgb,var(--lc) 14%,var(--card));box-shadow:inset 0 0 0 2px var(--lc)}#dr .on>i{background:var(--lc);color:#fff}
+#dr button.on{background:color-mix(in srgb,var(--lc) 14%,var(--card));box-shadow:inset 0 0 0 2px var(--lc)}#dr .on>i{background:var(--lc);color:var(--on-lc,#fff)}
 .stl{background:none;border-radius:0;scrollbar-width:thin;scrollbar-color:var(--fill) transparent;display:flex;flex-direction:column;gap:8px}
 .stl button{flex:none;border:0;border-radius:18px;background:var(--card);padding:12px 14px;font-size:17px;font-weight:600}
 .stl .on{background:color-mix(in srgb,var(--lc) 16%,var(--card));box-shadow:inset 0 0 0 2px var(--lc);font-weight:800}
@@ -163,12 +166,13 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
   <div class="stp s0"><div class="logo">TRN</div><p>MRT run tracker</p><div class="spin"></div></div>
   <div class="stp s1"><h1>Select line</h1><div class="top" id="ln"></div></div>
   <div class="stp s2"><button class="back" data-back="1">‹ Line</button><h1>Select direction</h1><div class="seg" id="dr"></div></div>
-  <div class="stp s3"><button class="back" data-back="2">‹ Direction</button><h1>Select station</h1><div style="display:flex;gap:8px;margin:0 0 10px"><input id="sq" placeholder="Search station or code" autocomplete="off" style="flex:1;min-width:0;height:44px;border:0;border-radius:22px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit"><button class="more" id="loc" style="margin:0;flex:none">📍 Nearest</button></div><button class="more" id="srt" style="margin:0 0 10px"></button><div class="stl" id="stl"></div><button class="more go" id="go">Start</button></div>
+  <div class="stp s3"><button class="back" data-back="2">‹ Direction</button><h1>Select station</h1><div style="display:flex;gap:8px;margin:0 16px 10px"><input id="sq" placeholder="Search station or code" autocomplete="off" style="flex:1;min-width:0;height:44px;border:0;border-radius:22px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit"><button class="more" id="loc" style="margin:0;flex:none;width:auto;padding:0 14px;white-space:nowrap">📍 Nearest</button></div><button class="more" id="srt" style="margin:0 16px 10px;width:auto"></button><div class="stl" id="stl"></div><button class="more go" id="go">Start</button></div>
   <div class="dots" id="dots"><b></b><b></b><b></b></div>
 </div>
 <button id="cfg" aria-label="Change line, direction or station"></button>
 <div class="row"><input id="q" inputmode="numeric" autocomplete="off" placeholder="Jump to run no." aria-label="Jump to run number"><button id="flip" aria-label="Switch direction"></button></div>
 <div class="tabs" id="tabs"><i></i><button data-t="-1">Upcoming</button><button data-t="0">Now</button><button data-t="1">Passed</button></div>
+<div id="note" hidden>Timetable may be out of date</div>
 <div class="wheel"><div class="strip" id="strip"></div></div>
 <div id="scrim"></div>
 <div id="sheet"><div id="grab"><i></i><b id="ttl"></b></div><div id="body"></div></div>
@@ -181,13 +185,16 @@ try { st = JSON.parse(localStorage.getItem("trn3") || "{}"); } catch (e) {}
 if (!st || typeof st !== "object") st = {};
 const hm = s => { s = ((s / 60 % 1440) + 1440) % 1440 | 0; return String(s / 60 | 0).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
 const sgt = () => Object.fromEntries(new Intl.DateTimeFormat("en-CA", {timeZone: "Asia/Singapore", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"}).formatToParts(new Date()).map(x => [x.type, x.value]));
+let stale = false;
+// shortcut: once the date is past every service's end the weekday/PH patterns keep repeating (specials excluded); upgrade = regenerate schedule.json
 function active(ds, dow) {
-  const a = new Set();
-  for (const id in S.services) { const v = S.services[id]; if (v.days[dow] && v.start <= ds && ds <= v.end) a.add(id); }
+  const a = new Set(), late = ds > Math.max(...Object.values(S.services).map(v => v.end)); if (late) stale = true;
+  for (const id in S.services) { const v = S.services[id]; if (v.days[dow] && v.start <= ds && (ds <= v.end || late && !/SPECIAL/.test(id))) a.add(id); }
   for (const [id, d, t] of S.exceptions) if (d === ds) t === 1 ? a.add(id) : a.delete(id);
   return a;
 }
 function days() {
+  stale = false;
   const p = sgt(), day = Date.UTC(p.year, p.month - 1, p.day), secs = p.hour * 3600 + p.minute * 60 + +p.second;
   return [0, 1].map(k => { const d = new Date(day - k * 864e5);
     return {k, now: secs + 86400 * k, act: active(d.toISOString().slice(0, 10).replaceAll("-", ""), (d.getUTCDay() + 6) % 7)}; });
@@ -210,7 +217,7 @@ function dname(line, d, z) { if (line === "CCL") return [dlab(line, d) === "Cloc
 function render() {
   if (!S) return;
   st.line = LINES.includes(st.line) ? st.line : "CCL";
-  document.documentElement.style.setProperty("--lc", N.colors[st.line]);
+  document.documentElement.style.setProperty("--lc", N.colors[st.line]); document.documentElement.style.setProperty("--on-lc", st.line === "CCL" ? "#000" : "#fff"); // white on CCL orange is ~2:1
   const e = ends(st.line), dirs = Object.keys(e).sort(); if (!dirs.includes(String(st.dir))) st.dir = +dirs[0];
   $("ln").innerHTML = LINES.map(l => `<button data-l="${l}" class="${l === st.line ? "on" : ""}" style="--c:${N.colors[l]}"><img src="caplets/lines/${l}.svg" alt="${l}"><span>${LN[l]}</span></button>`).join("");
   $("dr").innerHTML = dirs.map(d => { const r = S.trips.filter(t => t.line === st.line && t.dir === +d).reduce((a, t) => t.stops.length > a.stops.length ? t : a);
@@ -225,7 +232,7 @@ function render() {
   $("cfg").innerHTML = `${cap(st.stn)}<span><b>${nm(st.stn)}</b><small>${st.line === "CCL" ? dlab(st.line, st.dir) : nm(long.stops[0][0]) + " → " + nm(long.stops.at(-1)[0])}</small><u>${LN[st.line]}</u></span><em>⌄</em>`;
   [...$("dots").children].forEach((d, i) => d.classList.toggle("on", i + 1 === step));
   $("start").dataset.step = step;$("start").classList.toggle("hide", step === "app");
-  const ds = days(), secs = ds[0].now, occ = [];
+  const ds = days(), secs = ds[0].now, occ = []; $("note").hidden = !stale;
   for (const {k, act} of ds) for (const t of trips) if (act.has(t.service)) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) occ.push({t, at: t.stops[i][2] - 86400 * k, i, id: t.id + "|" + k}); }
   occ.sort((a, b) => a.at - b.at);
   let c = pin ? occ.findIndex(o => o.id === pin) : -1;
@@ -239,6 +246,12 @@ function render() {
   if (b) strip.scrollLeft = b.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2;
   upd(); try { localStorage.setItem("trn3", JSON.stringify(st)); } catch (e) {}
 }
+// keep times fresh: every 30 s and on returning to the tab, unless mid-gesture (act), in setup, or hidden; the centred run stays centred
+let act = 0;
+function refresh() { const sp = $("strip"); if (!S || step !== "app" || document.hidden || Date.now() - act < 5000) return;
+  const p = pin; if (cur >= 0 && (cur !== sp._now || document.body.classList.contains("open"))) pin = sp._o[cur].id; render(); pin = p; }
+setInterval(refresh, 30000); document.addEventListener("visibilitychange", refresh);
+$("body").addEventListener("scroll", () => act = Date.now());
 // continuous fisheye: size and fade follow distance from the centre
 let quiet = 0;
 function upd(user) {
@@ -293,23 +306,24 @@ function sheet(open, dy = 0, drag = false) {
   s.style.transition = drag ? "none" : open ? "transform .4s cubic-bezier(.215,.61,.355,1)" : "transform .6s cubic-bezier(.645,.045,.355,1)";
   s.style.transform = open ? `translateY(${dy}px)` : "translateY(105%)";
   const a = open ? Math.max(0, 1 - dy / s.offsetHeight) : 0;
-  sc.style.transition = drag ? "none" : "opacity .4s"; sc.style.opacity = .36 * a; sc.style.opacity = open ? .12 : 0;
+  sc.style.transition = drag ? "none" : "opacity .4s"; sc.style.opacity = drag ? .36 * a : open ? .12 : 0;
   if (open && !drag) { const at = $("body").querySelector(".at"); if (at) $("body").scrollTop = at.offsetTop - 120; }
 }
 { let y0 = null, dy = 0; const h = $("grab");
-  let sc = null;
-  h.onpointerdown = e => { if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; h.setPointerCapture(e.pointerId); return; } y0 = e.clientY; dy = 0; h.setPointerCapture(e.pointerId); };
+  let sc = null; const pc = e => { try { h.setPointerCapture(e.pointerId); } catch (_) {} };
+  h.onpointerdown = e => { act = Date.now(); if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; pc(e); return; } y0 = e.clientY; dy = 0; pc(e); };
   const big = b => { $("sheet").style.height = b ? "85dvh" : ""; $("sheet")._b = b; };
-  h.onpointermove = e => { if (sc) { sc[0].scrollTop += sc[1] - e.clientY; sc[1] = e.clientY; return; } if (y0 == null) return; dy = e.clientY - y0; if (dy > 0 && !$("sheet")._b) sheet(true, dy, true); };
+  h.onpointermove = e => { act = Date.now(); if (sc) { sc[0].scrollTop += sc[1] - e.clientY; sc[1] = e.clientY; return; } if (y0 == null) return; dy = e.clientY - y0; if (dy > 0 && !$("sheet")._b) sheet(true, dy, true); };
   h.onpointerup = () => { if (sc) { sc = null; return; } if (y0 == null) return; y0 = null;
     if (dy < -40) big(true); else if ($("sheet")._b) { if (dy > 60) big(false); } else sheet(dy < 90, 0); if (!$("sheet")._b && dy >= 90) big(false); };
   $("scrim").onclick = () => sheet(false); }
 // mouse wheel / trackpad: vertical wheel scrolls the horizontal strip
 $("strip").addEventListener("wheel", e => { if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; e.preventDefault(); $("strip").scrollBy({left: e.deltaY, behavior: "auto"}); }, {passive: false});
-$("strip").onscroll =() => requestAnimationFrame(() => upd(true));
+$("strip").onscroll =() => { act = Date.now(); if (Date.now() < quiet) quiet = Date.now() + 600; requestAnimationFrame(() => upd(true)); }; // programmatic scrolls (render, tabs) stay quiet until they settle
 $("strip").onclick = e => { const b = e.target.closest("button"); if (!b) return;
   if (+b.dataset.i === cur) sheet(true); else b.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
 $("tabs").onclick = e => { const b = e.target.closest("button"), sp = $("strip"); if (!b) return;
+  quiet = Date.now() + 1000; if (document.body.classList.contains("open")) sheet(false); // a tab-driven scroll must not pop the sheet
   if (pin) { pin = null; render(); } // pinned far-away run: re-centre on now first
   if (sp._now < 0) return;
   const t = sp.children[Math.min(Math.max(sp._now + +b.dataset.t, 0), sp.children.length - 1)]; if (t) t.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
@@ -321,7 +335,7 @@ const flt = () => { const q = $("sq").value.trim().toLowerCase(); for (const b o
 $("sq").oninput = flt;
 $("loc").onclick = () => { const b = $("loc"); if (!navigator.geolocation) { b.textContent = "No location"; return; } b.textContent = "Locating…";
   navigator.geolocation.getCurrentPosition(p => { b.textContent = "📍 Nearest"; let best, d0 = 1e9; for (const x of $("stl").children) { const q = N.pos && N.pos[x.dataset.s]; if (!q) continue; const d = (q[0] - p.coords.latitude) ** 2 + ((q[1] - p.coords.longitude) * .9997) ** 2; if (d < d0) { d0 = d; best = x.dataset.s; } } if (best) { st.stn = best; pin = null; $("sq").value = ""; render(); } },
-    () => { b.textContent = "Location denied"; }, { timeout: 8000, maximumAge: 60000 }); };
+    () => { b.textContent = "Location denied"; setTimeout(() => b.textContent = "📍 Nearest", 3000); }, { timeout: 8000, maximumAge: 60000 }); };
 $("srt").onclick = () => { byCode = !byCode; render(); };
 $("cfg").onclick =() => { step = 1; render(); };
 $("go").onclick = () => { st.ok = 1; step = "app"; render(); };
@@ -329,14 +343,15 @@ $("start").addEventListener("click", e => { const b = e.target.closest("[data-ba
 $("ln").addEventListener("click", e => { if (e.target.closest("button")) { step = 2; render(); } });
 $("dr").addEventListener("click", e => { if (e.target.closest("button")) { step = 3; render(); const b = $("stl").querySelector(".on"); if (b) $("stl").scrollTop = b.offsetTop - 160; } });
 $("q").oninput = () => { const q = $("q").value.trim().replace(/^0+(?=\d)/, "").toUpperCase(); if (!S) return; if (!q) { $("q").style.outline = ""; return; }
-  const t = S.trips.find(t => t.line === st.line && t.dir === st.dir && String(t.trn).toUpperCase() === q && t.stops.some(x => x[0] === st.stn)); $("q").style.outline = t ? "" : "2px solid #e5484d"; if (!t) return;
-  const k = days().findIndex(d => d.act.has(t.service)); if (k < 0) { $("q").style.outline = "2px solid #e5484d"; return; } // not running in the days shown
-  pin = t.id + "|" + Math.max(k, 0); render(); };
+  const ds = days(), c = []; // every pass of this run at the station in the days shown; jump to the next one, else the latest
+  for (const t of S.trips) if (t.line === st.line && t.dir === st.dir && String(t.trn).toUpperCase() === q) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) for (const d of ds) if (d.act.has(t.service)) c.push({id: t.id + "|" + d.k, at: t.stops[i][2] - 86400 * d.k}); }
+  $("q").style.outline = c.length ? "" : "2px solid #e5484d"; if (!c.length) return;
+  c.sort((a, b) => a.at - b.at); pin = (c.find(o => o.at >= ds[0].now) || c.at(-1)).id; render(); };
 (async () => {
   try { [S, N] = await Promise.all(["schedule.json", "names.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }))); }
-  catch (e) { $("start").innerHTML = `<p class="empty">Couldn't load data (${e.message}).</p>`; return; }
-  render();
-  setTimeout(() => { step = st.ok ? "app" : 1; render(); }, 1000); // splash
+  catch (e) { $("start").innerHTML = `<p class="empty">Couldn't load data (${e.message}).</p><button class="more" style="margin:0 16px;width:auto" onclick="location.reload()">Retry</button>`; return; }
+  step = st.ok ? "app" : 0; render();
+  if (!st.ok) setTimeout(() => { step = 1; render(); }, 1000); // splash on first run only
 })();
 </script>
 </body>
