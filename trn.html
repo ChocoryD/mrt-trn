@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TRN">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<title>TRN</title>
+<style>
+:root{--bg:#000;--card:#1c1c1e;--ink:#fff;--mute:#8e8e93;--fill:#7676803d;--lc:#fa9e0d}
+@media (prefers-color-scheme:light){:root{--bg:#f2f2f7;--card:#fff;--ink:#000;--fill:#7676801f}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;height:100dvh;overflow:hidden;padding:env(safe-area-inset-top) 0 0}
+.top{display:flex;justify-content:space-between;padding:14px 16px 10px}
+.top button{width:46px;height:46px;border-radius:50%;border:0;background:var(--c);color:#fff;font:inherit;font-weight:800;font-size:15px;opacity:.35;transition:opacity .15s,transform .15s}
+.top .on{opacity:1;transform:scale(1.1)}
+.seg{display:flex;background:var(--fill);border-radius:10px;padding:2px;margin:0 16px 8px}
+.seg button{flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:14px;font-weight:600;padding:8px 4px;border-radius:8px}
+.seg .on{background:var(--lc);color:#fff}
+.row{display:flex;gap:8px;margin:14px 16px 0}
+.row input{height:52px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:inherit;font-size:16px;padding:0 12px;width:96px;font-weight:700;text-align:center}
+#cfg{flex:1;min-width:0;height:52px;display:flex;align-items:center;gap:12px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:inherit;padding:0 14px;text-align:left}
+#cfg i,.stl i{font-style:normal;font-weight:800;font-size:13px;background:var(--lc);color:#fff;border-radius:8px;padding:3px 7px;min-width:34px;text-align:center}
+#cfg span{flex:1;min-width:0;font-weight:700;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cfg small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+#cfg em{font-style:normal;color:var(--mute)}
+#start{position:fixed;inset:0;z-index:8;background:var(--bg);display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 calc(14px + env(safe-area-inset-bottom));transition:transform .45s cubic-bezier(.645,.045,.355,1)}
+#start.hide{transform:translateY(100%);pointer-events:none}
+#start h1{font-size:30px;margin:8px 20px 18px}
+.stp{display:none;flex:1;min-height:0;flex-direction:column;padding-top:22px}
+#start[data-step="0"] .s0,#start[data-step="1"] .s1,#start[data-step="2"] .s2,#start[data-step="3"] .s3{display:flex}
+.s0{align-items:center;justify-content:center;gap:10px}
+.logo{font-size:84px;font-weight:900;letter-spacing:-2px;background:linear-gradient(90deg,#d42e12,#009645,#9900aa,#fa9e0d,#005ec4,#9d5b25);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s0 p{margin:0;color:var(--mute)}
+.spin{width:28px;height:28px;margin-top:24px;border:3px solid var(--fill);border-top-color:var(--ink);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.back{align-self:flex-start;border:0;background:none;color:var(--lc);font:inherit;font-weight:600;padding:0 20px 6px}
+#start .top{flex-direction:column;gap:12px;padding:0 16px}
+#start .top button{width:100%;height:64px;border-radius:18px;opacity:1;transform:none;display:flex;align-items:center;gap:14px;padding:0 18px;text-align:left}
+#start .top b{font-size:22px;min-width:44px}#start .top span{font-weight:600;font-size:17px}
+#start .seg{flex-direction:column;background:none;gap:12px;padding:0;margin:0 16px}
+#start .seg button{background:var(--card);height:64px;font-size:18px;text-align:left;padding:0 18px;border-radius:18px;color:var(--ink)}
+.stl{flex:1;min-height:0;overflow-y:auto;margin:0 16px;background:var(--card);border-radius:14px}
+.stl button{display:flex;align-items:center;gap:14px;width:100%;border:0;border-bottom:1px solid var(--fill);background:none;color:var(--ink);font:inherit;padding:13px 14px;text-align:left}
+.stl .on{background:var(--fill);font-weight:700}
+.stl{position:relative}
+#start .go{margin:12px 16px 0;width:auto}
+.hint{display:flex;justify-content:space-between;margin:16px 20px 0;font-size:12px;color:var(--mute);font-weight:600;text-transform:uppercase}
+.wheel{position:relative;flex:none;margin-top:4px}
+.strip{position:relative;display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:40px calc(50% - 48px) 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.strip::-webkit-scrollbar{display:none}
+.strip button{flex:none;width:96px;height:96px;scroll-snap-align:center;border:0;border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:center;transform-origin:center}
+.strip b{display:block;font-size:34px;line-height:1.1}.strip span{font-size:14px;color:var(--mute)}
+.info{flex:1;min-height:0;overflow-y:auto;margin:14px 0 0;background:var(--card);border-radius:22px 22px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));position:relative}
+.hd{position:sticky;top:-20px;margin:-20px -20px 0;padding:20px 20px 4px;background:var(--card);z-index:1}
+.info h2{margin:0;font-size:56px;line-height:1;color:var(--lc)}
+.info .r{font-size:19px;font-weight:600;margin:8px 0 6px}
+.info .p{display:inline-block;background:var(--fill);border-radius:99px;padding:4px 12px;font-size:15px;font-weight:600;margin-bottom:14px}
+.s{display:flex;gap:14px;padding:8px 0;font-size:17px}.s time{width:50px;color:var(--mute);flex:none}
+.s.at{color:var(--lc);font-weight:700}.s.at time{color:var(--lc)}
+.more{display:block;width:100%;margin-top:18px;height:48px;border:0;border-radius:24px;background:var(--lc);color:#fff;font:inherit;font-weight:700}
+#scrim{position:fixed;inset:0;background:#12141c;opacity:0;pointer-events:none;z-index:5}
+#sheet{position:fixed;left:0;right:0;bottom:0;height:42dvh;background:var(--card);border-radius:18px 18px 0 0;z-index:6;transform:translateY(105%);display:flex;flex-direction:column}
+#grab{touch-action:none;padding:10px 20px 12px;text-align:center;cursor:grab}
+#grab i{display:block;width:52px;height:6px;border-radius:3px;background:var(--mute);opacity:.5;margin:0 auto 10px}
+#grab{text-align:left}#grab i{margin:0 auto 14px}
+#grab h2{margin:0;font-size:52px;line-height:1;color:var(--lc)}
+#grab .r{font-size:18px;font-weight:600;margin:6px 0 8px}
+#grab .p{display:inline-block;background:var(--fill);border-radius:99px;padding:4px 12px;font-size:14px;font-weight:600}
+body{max-width:520px;margin:0 auto}
+#sheet{max-width:520px;margin:0 auto;height:42dvh}
+.hint{margin-top:28px}
+#sheet{transition:height .3s}#body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;padding:0 20px calc(20px + env(safe-area-inset-bottom))}
+.empty{color:var(--mute);text-align:center;padding:30px}
+/* restyle: tinted surfaces, big radii, line-coloured glow, timeline stops (ideas from ui.watermelon.sh auth-01) */
+:root{--card:#232326;--bg:#0b0b0d}
+@media (prefers-color-scheme:light){:root{--card:#fff;--bg:#ececf2}}
+h1,.logo,#grab h2{font-weight:800;letter-spacing:-.03em}
+#start .top button,#start .seg button,.stl,#cfg,.row input{border-radius:24px;}
+#start .top button{background:linear-gradient(180deg,var(--c),color-mix(in srgb,var(--c) 70%,#000))}
+.top .on{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--c)}
+.go,.more{height:52px;border-radius:99px;background:linear-gradient(180deg,var(--lc),color-mix(in srgb,var(--lc) 70%,#000));font-size:16px}
+.strip button{border-radius:26px;background:linear-gradient(180deg,color-mix(in srgb,var(--card) 100%,#fff 6%),var(--card))}
+#sheet{border-radius:28px 28px 0 0;box-shadow:0 0 0 1px var(--fill)}
+#grab h2{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.rt{font-size:14px;font-weight:800;letter-spacing:.02em;border-radius:99px;padding:4px 12px;color:#fff;background:var(--lc)}
+.rt.kS,.rt.kP{background:var(--fill);color:var(--ink)}
+.ph div{display:grid;grid-template-columns:96px 1fr;gap:2px 10px;align-items:baseline;align-content:center;height:56px;box-sizing:border-box;scroll-snap-align:start;padding:0 12px;border-radius:12px;background:var(--fill);border-left:4px solid var(--mute)}
+.ph div.on{border-left-color:var(--lc);background:color-mix(in srgb,var(--lc) 18%,var(--fill))}.ph div.on b{color:var(--lc)}
+.ph time{font-size:13px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums;grid-row:span 2}
+.ph b{font-size:14px;font-weight:800;color:var(--ink)}
+.ph em{font-style:normal;font-size:11px;font-weight:800;margin-left:8px;padding:2px 8px;border-radius:99px;background:var(--lc);color:#fff;vertical-align:1px}
+.ph{height:56px;transition:height .3s cubic-bezier(.2,.8,.2,1);overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;margin:0}.ph::-webkit-scrollbar{display:none}
+.ph.x{scroll-snap-type:none}.phc{display:block;width:100%;border:0;background:none;font-family:inherit;cursor:pointer;margin:6px 0 10px;text-align:center;font-size:12px;font-weight:700;color:var(--mute)}
+.ph small{font-size:12px;font-weight:600;color:var(--mute)}
+.rr.lt{color:var(--lc);font-weight:800}
+.rr{font-size:14px;font-weight:600;color:var(--mute);margin:2px 0 8px}
+#grab .p{background:color-mix(in srgb,var(--lc) 18%,transparent);color:var(--lc)}
+.s{padding:0;gap:12px;align-items:stretch}.s::before{content:"";order:1;width:12px;flex:none;opacity:.5;background:radial-gradient(circle,var(--lc) 4.5px,transparent 5.5px) center/12px 12px no-repeat,linear-gradient(var(--lc),var(--lc)) center/2px 100% no-repeat}
+.s time{order:0;padding:10px 0}.s>:last-child{order:2;padding:10px 0}.s.at::before{opacity:1}.s.past{opacity:.45}.cap{height:26px;width:auto;flex:none;vertical-align:middle}.s .cap{height:22px;margin-right:10px}
+/* additions: floating pill, step dots, tabs, progress bar, shimmer, step transition */
+#cfg{flex:none;margin:14px 16px 0;height:auto;border-radius:28px;padding:14px 18px;gap:14px;box-shadow:0 0 0 1px var(--fill)}
+#cfg .cap{height:34px}
+#cfg b{display:block;font-size:30px;line-height:1.05;font-weight:800;letter-spacing:-.03em;color:var(--lc);overflow:hidden;text-overflow:ellipsis}
+#cfg small{font-size:16px;font-weight:600;color:var(--ink);margin-top:4px}
+#cfg u{display:inline-block;text-decoration:none;margin-top:8px;background:color-mix(in srgb,var(--lc) 18%,transparent);color:var(--lc);border-radius:99px;padding:3px 12px;font-size:13px;font-weight:600}
+#body{scrollbar-width:thin;scrollbar-color:var(--fill) transparent}
+#cfg:active{transform:scale(.98)}
+.row{margin-right:16px}.row input{width:100%;min-width:0}
+#flip{flex:none;max-width:55%;height:52px;border:0;border-radius:24px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;white-space:nowrap;box-shadow:inset 0 0 0 2px var(--lc)}
+#flip span{overflow:hidden;text-overflow:ellipsis}#flip:active{transform:scale(.97)}
+.tabs{position:relative;display:flex;margin:22px 16px 0;padding:3px;background:var(--fill);border-radius:99px}
+.tabs i{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/3);border-radius:99px;background:var(--lc);transition:transform .35s cubic-bezier(.215,.61,.355,1)}
+.tabs button{position:relative;flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:9px 0;transition:color .2s}
+.tabs button.on{color:#fff}
+.hint{display:none}
+.dots{display:none;justify-content:center;gap:8px;padding:14px 0 4px}
+.dots b{width:8px;height:8px;border-radius:99px;background:var(--fill);transition:width .3s,background .3s}
+.dots b.on{width:26px;background:var(--lc)}
+#start:not([data-step="0"]):not([data-step="app"]) .dots{display:flex}
+.stp{animation:stp .4s cubic-bezier(.215,.61,.355,1)}@keyframes stp{from{opacity:0;transform:translateX(24px)}}
+.go{position:relative;overflow:hidden}.go::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#fff5 50%,transparent 70%);transform:translateX(-100%);animation:shim 2.4s infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+.prog{height:6px;border-radius:99px;background:var(--fill);margin:12px 0 2px;overflow:hidden}.prog i{display:block;height:100%;border-radius:99px;background:var(--lc);transition:width .4s}
+.cnt{font-size:12px;color:var(--mute);font-weight:600}
+.wheel{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-top:0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.wheel .strip{flex:1;min-height:0;align-items:center;transition:transform .4s cubic-bezier(.215,.61,.355,1)}
+/* sheet open: lift the wheel to the middle of the space above it (transform only, so no relayout mid-scroll) */
+body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bottom) - 42dvh) / 2))}
+#sheet{bottom:0}
+/* setup screens */
+.stp{width:100%;max-width:520px;margin:0 auto}
+#start h1{font-size:32px;font-weight:800;letter-spacing:-.03em}
+#ln{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;overflow-y:auto}
+#ln button{position:relative;overflow:hidden;height:auto;min-height:112px;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:2px;padding:16px;border-radius:24px;background:var(--c);color:#fff;box-shadow:none}
+#ln button::after{content:"";position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:#fff3}
+#ln b{font-size:34px;font-weight:800;letter-spacing:-.03em;min-width:0}#ln span{font-size:14px;font-weight:600;opacity:.9}
+#ln button.on{box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--c)}
+#dr{display:flex;flex-direction:column;gap:12px;padding:0 16px}
+#start #dr button{flex:none;min-height:104px;height:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-radius:24px;background:var(--card);color:var(--ink);border:0;font:inherit;text-align:left;box-shadow:inset 0 0 0 2px transparent}
+#dr b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em}#dr small{display:block;margin-top:6px;font-size:14px;font-weight:600;color:var(--mute)}
+#dr em{display:flex;align-items:center;gap:8px;margin-top:10px;font-style:normal}#dr s{text-decoration:none;color:var(--mute);font-weight:700}
+#dr button>i{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:20px;background:var(--fill)}
+#dr button.on{background:color-mix(in srgb,var(--lc) 14%,var(--card));box-shadow:inset 0 0 0 2px var(--lc)}#dr .on>i{background:var(--lc);color:#fff}
+.stl{background:none;border-radius:0;scrollbar-width:thin;scrollbar-color:var(--fill) transparent;display:flex;flex-direction:column;gap:8px}
+.stl button{flex:none;border:0;border-radius:18px;background:var(--card);padding:12px 14px;font-size:17px;font-weight:600}
+.stl .on{background:color-mix(in srgb,var(--lc) 16%,var(--card));box-shadow:inset 0 0 0 2px var(--lc);font-weight:800}
+#start .go{height:56px;font-size:17px;font-weight:700}
+@media (prefers-reduced-motion:reduce){.stp,.go::after{animation:none}.tabs i,.dots b,.prog i{transition:none}}
+</style>
+</head>
+<body>
+<div id="start" data-step="0">
+  <div class="stp s0"><div class="logo">TRN</div><p>MRT run tracker</p><div class="spin"></div></div>
+  <div class="stp s1"><h1>Select line</h1><div class="top" id="ln"></div></div>
+  <div class="stp s2"><button class="back" data-back="1">‹ Line</button><h1>Select direction</h1><div class="seg" id="dr"></div></div>
+  <div class="stp s3"><button class="back" data-back="2">‹ Direction</button><h1>Select station</h1><div style="display:flex;gap:8px;margin:0 0 10px"><input id="sq" placeholder="Search station or code" autocomplete="off" style="flex:1;min-width:0;height:44px;border:0;border-radius:22px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit"><button class="more" id="loc" style="margin:0;flex:none">📍 Nearest</button></div><button class="more" id="srt" style="margin:0 0 10px"></button><div class="stl" id="stl"></div><button class="more go" id="go">Start</button></div>
+  <div class="dots" id="dots"><b></b><b></b><b></b></div>
+</div>
+<button id="cfg" aria-label="Change line, direction or station"></button>
+<div class="row"><input id="q" inputmode="numeric" autocomplete="off" placeholder="Jump to run no." aria-label="Jump to run number"><button id="flip" aria-label="Switch direction"></button></div>
+<div class="tabs" id="tabs"><i></i><button data-t="-1">Upcoming</button><button data-t="0">Now</button><button data-t="1">Passed</button></div>
+<div class="wheel"><div class="strip" id="strip"></div></div>
+<div id="scrim"></div>
+<div id="sheet"><div id="grab"><i></i><b id="ttl"></b></div><div id="body"></div></div>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+const $ = id => document.getElementById(id), P = n => /^\d+$/.test(n) ? n.padStart(3, "0") : n;
+let byCode = false, phX = false;
+let S, N, st = {}, pin = null, cur = -1, tm;
+try { st = JSON.parse(localStorage.getItem("trn3") || "{}"); } catch (e) {}
+if (!st || typeof st !== "object") st = {};
+const hm = s => { s = ((s / 60 % 1440) + 1440) % 1440 | 0; return String(s / 60 | 0).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+const sgt = () => Object.fromEntries(new Intl.DateTimeFormat("en-CA", {timeZone: "Asia/Singapore", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"}).formatToParts(new Date()).map(x => [x.type, x.value]));
+function active(ds, dow) {
+  const a = new Set();
+  for (const id in S.services) { const v = S.services[id]; if (v.days[dow] && v.start <= ds && ds <= v.end) a.add(id); }
+  for (const [id, d, t] of S.exceptions) if (d === ds) t === 1 ? a.add(id) : a.delete(id);
+  return a;
+}
+function days() {
+  const p = sgt(), day = Date.UTC(p.year, p.month - 1, p.day), secs = p.hour * 3600 + p.minute * 60 + +p.second;
+  return [0, 1].map(k => { const d = new Date(day - k * 864e5);
+    return {k, now: secs + 86400 * k, act: active(d.toISOString().slice(0, 10).replaceAll("-", ""), (d.getUTCDay() + 6) % 7)}; });
+}
+const cap = c => `<img class="cap" src="caplets/${(c.match(/^[A-Z]+/)||[""])[0]}/${c}.svg" alt="${c}" onerror="this.outerHTML='<i>'+this.alt+'</i>'">`;
+const nm = c => N.names[c] || c;
+const LN = {NSL: "North-South", EWL: "East-West", NEL: "North East", CCL: "Circle", DTL: "Downtown", TEL: "Thomson-East Coast"};
+let step = 0;
+const LINES = ["NSL", "EWL", "NEL", "CCL", "DTL", "TEL"];
+function ends(line) { const c = {}; for (const t of S.trips) if (t.line === line && t.dir != null) { const k = t.dir + "|" + t.stops.at(-1)[0]; c[k] = (c[k] || 0) + 1; }
+  const o = {}; for (const k in c) { const [d, z] = k.split("|"); if (!o[d] || c[k] > o[d][1]) o[d] = [z, c[k]]; } return o; }
+// CCL is a loop: ascending CC numbers run anticlockwise
+function dlab(line, d, z) {
+  if (line !== "CCL") return "To " + nm(z);
+  const t = S.trips.find(t => t.line === line && t.dir === +d && t.stops.length > 10), n = i => +t.stops[i][0].match(/\d+/)[0];
+  return t && n(9) > n(10) ? "Clockwise" : "Anticlockwise";
+}
+function render() {
+  if (!S) return;
+  st.line = LINES.includes(st.line) ? st.line : "CCL";
+  document.documentElement.style.setProperty("--lc", N.colors[st.line]);
+  const e = ends(st.line), dirs = Object.keys(e).sort(); if (!dirs.includes(String(st.dir))) st.dir = +dirs[0];
+  $("ln").innerHTML = LINES.map(l => `<button data-l="${l}" class="${l === st.line ? "on" : ""}" style="--c:${N.colors[l]}"><b>${l}</b><span>${LN[l]}</span></button>`).join("");
+  $("dr").innerHTML = dirs.map(d => { const r = S.trips.filter(t => t.line === st.line && t.dir === +d).reduce((a, t) => t.stops.length > a.stops.length ? t : a);
+    return `<button data-d="${d}" class="${+d === st.dir ? "on" : ""}"><span><b>${dlab(st.line, d, e[d][0])}</b><small>${nm(r.stops[0][0])} → ${nm(r.stops.at(-1)[0])}</small><em>${cap(r.stops[0][0])}<s>→</s>${cap(r.stops.at(-1)[0])}</em></span><i>${+d ? "↘" : "↖"}</i></button>`; }).join("");
+  $("flip").innerHTML = `⇄ <span>${dlab(st.line, st.dir, e[st.dir][0])}</span>`; $("flip").hidden = dirs.length < 2;
+  const trips = S.trips.filter(t => t.line === st.line && t.dir === st.dir), long = trips.reduce((a, t) => t.stops.length > a.stops.length ? t : a, trips[0]);
+  const codes = long.stops.map(x => x[0]); if (!codes.includes(st.stn)) st.stn = codes[codes.length >> 1];
+  const cn = c => c.replace(/\d+$/, "") + (c.match(/\d+$/)||[""])[0].padStart(3, "0");
+  setTimeout(flt);
+  $("srt").textContent = byCode ? "Sorted by code · tap for route order" : "Sorted by route · tap for code";
+  $("stl").innerHTML = (byCode ? [...codes].sort((a, b) => cn(a) < cn(b) ? -1 : 1) : codes).map(c => `<button data-s="${c}" class="${c === st.stn ? "on" : ""}">${cap(c)}${nm(c)}</button>`).join("");
+  $("cfg").innerHTML = `${cap(st.stn)}<span><b>${nm(st.stn)}</b><small>${st.line === "CCL" ? dlab(st.line, st.dir) : nm(long.stops[0][0]) + " → " + nm(long.stops.at(-1)[0])}</small><u>${LN[st.line]}</u></span><em>⌄</em>`;
+  [...$("dots").children].forEach((d, i) => d.classList.toggle("on", i + 1 === step));
+  $("start").dataset.step = step;$("start").classList.toggle("hide", step === "app");
+  const ds = days(), secs = ds[0].now, occ = [];
+  for (const {k, act} of ds) for (const t of trips) if (act.has(t.service)) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) occ.push({t, at: t.stops[i][2] - 86400 * k, i, id: t.id + "|" + k}); }
+  occ.sort((a, b) => a.at - b.at);
+  let c = pin ? occ.findIndex(o => o.id === pin) : -1;
+  if (c < 0) { c = occ.findLastIndex(o => o.at <= secs); if (c < 0) c = 0; }
+  const list = occ.slice(Math.max(0, c - 30), c + 31).reverse(), strip = $("strip"); // left = later runs, right = earlier
+  strip.innerHTML = list.map((o, i) => `<button data-i="${i}"><b>${P(o.t.trn)}</b><span>${hm(o.at)}</span></button>`).join("");
+  strip._o = list; strip._secs = secs; cur = -1;
+  strip._now = list.indexOf(occ[occ.findLastIndex(o => o.at <= secs)]);
+  const b = strip.children[list.indexOf(occ[c])];
+  quiet = Date.now() + 800;
+  if (b) strip.scrollLeft = b.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2;
+  upd(); try { localStorage.setItem("trn3", JSON.stringify(st)); } catch (e) {}
+}
+// continuous fisheye: size and fade follow distance from the centre
+let quiet = 0;
+function upd(user) {
+  const sp = $("strip"), mid = sp.scrollLeft + sp.clientWidth / 2; let best = -1, bd = 1e9;
+  [...sp.children].forEach((b, i) => { const sd = b.offsetLeft + b.offsetWidth / 2 - mid, d = Math.abs(sd), n = d / 102;
+    const k = Math.max(0, 1 - n); // 1 at centre: lifted up, bigger, ringed
+    const m = Math.min(n, 3); // radial arc: side cards tilt and drop away from the centre
+    b.style.transform = `translateY(${-26 * k + 7 * m * m}px) rotate(${Math.sign(sd) * m * 2}deg) scale(${Math.max(.6, .85 + .27 * k - Math.max(0, n - 1) * .17)})`; b.style.opacity = Math.max(.25, 1 - n * .3);
+    b.style.boxShadow = k > .5 ? `0 0 0 3px var(--lc)` : "none";
+    if (d < bd) { bd = d; best = i; } });
+  if (best !== cur && sp._now >= 0) { const t = Math.sign(best - sp._now); // list is reversed: higher index = earlier = passed
+    $("tabs").firstChild.style.transform = `translateX(${(t + 1) * 100}%)`; [...$("tabs").children].slice(1).forEach(x => x.classList.toggle("on", +x.dataset.t === t)); }
+  if (best === cur) return; cur = best; clearTimeout(tm); tm = setTimeout(() => { info(sp._o[best], sp._secs); if (user && Date.now() > quiet) sheet(true); }, user ? 450 : 0); // pops up once you stop on a run
+}
+// run type from the whole run (all trips of one trn on one service day):
+// AM = withdrawn by noon, HD = half day (off by 17:00), PM = signs on after noon, FD = both peaks; LN = last trip leaves its terminus after ~21:30
+const RUN = {};
+const cclKind = x => { const a = x.stops[0][0], z = x.stops.at(-1)[0]; return a + z === "CC1CC6" || a + z === "CC6CC1" ? "Shuttle" : a === z && x.stops.length >= 28 ? "Loop" : "Short working"; };
+function runType(t) {
+  const k = t.line + "|" + t.service + "|" + t.trn;
+  if (!RUN[k]) {
+    let a = 1e9, z = 0, l = 0; const ts = [];
+    for (const x of S.trips) if (x.line === t.line && x.service === t.service && x.trn === t.trn) { ts.push(x); a = Math.min(a, x.stops[0][2]); z = Math.max(z, x.stops.at(-1)[1]); l = Math.max(l, x.stops[0][2]); }
+    // CCL: a run can switch between the Dhoby Ghaut–Stadium shuttle and the full loop; list its phases in order
+    const ph = []; for (const x of ts.sort((p, q) => p.stops[0][2] - q.stops[0][2])) { const k = t.line === "CCL" ? cclKind(x) : "", c = !k ? [nm(x.stops[0][0]), nm(x.stops.at(-1)[0])].sort().join(" ⇄ ") : k === "Loop" ? dlab("CCL", x.dir) : k === "Shuttle" ? `Shuttle|${nm("CC1")} ⇄ ${nm("CC6")}` : k === "Short working" ? `Short working|${nm(x.stops[0][0])} → ${nm(x.stops.at(-1)[0])}` : k, e = ph.at(-1); if (e && e[0] === c) { e[2] = x.stops.at(-1)[1]; e[3]++; } else ph.push([c, x.stops[0][2], x.stops.at(-1)[1], 1, `${nm(x.stops[0][0])} → ${nm(x.stops.at(-1)[0])}`]); }
+    const h = s => s / 3600;
+    // thresholds fitted to the NSL and EWL published run lists (every listed run matches); DTL is numbered 1xx FD / 2xx AM / 3xx PM
+    const d = { 1: "FD", 2: "AM", 3: "PM" }[String(t.trn)[0]];
+    const ln = h(l) > 21.5 ? " LN" : ""; // DTL keeps its numbering as the base type but still gets LN
+          RUN[k] = [t.line === "DTL" && d ? d + (d === "AM" ? "" : ln) : h(z) <= 12 ? "AM" : h(z) <= 17 && h(a) < 12 ? "HD" : (h(a) >= 12 ? "PM" : "FD") + ln, a, z, ph];
+  }
+  return RUN[k];
+}
+// last train to a station = the latest evening trip (leaves after 18:00) that terminates there, per line/service/direction
+const LAST = {};
+function lastTrips(t) {
+  const k = t.line + "|" + t.service;
+  if (!LAST[k]) { const m = {}; for (const x of S.trips) if (x.line === t.line && x.service === t.service && x.dir != null) { const z = x.dir + "|" + x.stops.at(-1)[0]; if (!m[z] || x.stops[0][2] > m[z].stops[0][2]) m[z] = x; } LAST[k] = t.line === "CCL" ? [] : Object.values(m).filter(x => x.stops[0][2] >= 64800); }
+  return LAST[k].filter(x => x.trn === t.trn).sort((a, b) => a.stops[0][2] - b.stops[0][2]);
+}
+function info(o, secs) {
+  if (!o) return;
+  const dm = Math.round((o.at - secs) / 60), [rt, ra, rz, ph] = runType(o.t), ck = o.t.line === "CCL" ? cclKind(o.t) : "", lt = lastTrips(o.t);
+  $("ttl").innerHTML = `<h2>${P(o.t.trn)}<span class="rt">${rt}</span>${ck ? `<span class="rt k${ck[0]}">${ck === "Loop" ? dlab("CCL", o.t.dir) : ck}</span>` : ""}</h2><div class="rr">Run ${hm(ra)} – ${hm(rz)}</div>${ph?.length > 1 ? `<div class="ph${phX ? " x" : ""}" id="ph">${ph.map((p, i) => `<div class="${p[1] <= o.t.stops[0][2] && o.t.stops[0][2] <= p[2] ? "on" : ""}"><time>${hm(p[1])}–${hm(p[2])}</time><b>${p[3] === 1 && !p[0].includes("|") && p[0].includes("⇄") ? p[4] : p[0].split("|")[0]}${i === ph.length - 1 ? `<em>${p[3] === 1 ? "Last trip" : "Ends run"}</em>` : ""}</b><small>${p[0].split("|")[1] || ""}</small></div>`).join("")}</div><button class="phc" id="phc"></button>` : ""}${lt.length ? `<div class="rr lt">★ Last train to ${lt.map(x => nm(x.stops.at(-1)[0]) + " (" + hm(x.stops[0][2]) + ")").join(" · ")}</div>` : ""}<div class="r">${nm(o.t.stops[0][0])} → ${nm(o.t.stops.at(-1)[0])}</div><div class="p">${hm(o.at)} at ${nm(st.stn)} · ${dm > 0 ? "in " + dm + " min" : dm === 0 ? "now" : -dm + " min ago"}</div><div class="prog"><i style="width:${(o.i + 1) / o.t.stops.length * 100}%"></i></div><div class="cnt">Stop ${o.i + 1} of ${o.t.stops.length}</div>`;
+  $("body").innerHTML = o.t.stops.map((x, i) => `<div class="s${i === o.i ? " at" : i < o.i ? " past" : ""}"><time>${hm(x[1])}</time><span>${cap(x[0])}${nm(x[0])}</span></div>`).join("");
+  const pe = $("ph"); if (pe) { const hh = () => phX ? Math.min(pe.children.length * 56, innerHeight * .32) + "px" : "56px"; pe.style.height = hh(); const f = () => { $("phc").textContent = phX ? "Collapse ▴" : `Phase ${Math.round(pe.scrollTop / 56) + 1} of ${pe.children.length} · swipe ↕ · tap to expand`; }; pe.onscroll = f; const i = Math.max(0, [...pe.children].findIndex(d => d.classList.contains("on"))); pe.scrollTop = phX ? 0 : i * 56; f(); $("phc").onclick = () => { phX = !phX; pe.classList.toggle("x", phX); pe.style.height = hh(); pe.scrollTop = phX ? 0 : i * 56; f(); }; }
+  const at = $("body").querySelector(".at"); if (at) $("body").scrollTop = at.offsetTop - 120; // keep the current stop in view when the run changes
+}
+// bottom sheet (motion-prompt #051): rises easeOutCubic .4s, handle drag down to close, scrim .36
+function sheet(open, dy = 0, drag = false) {
+  const s = $("sheet"), sc = $("scrim"); if (!drag) document.body.classList.toggle("open", open);
+  s.style.transition = drag ? "none" : open ? "transform .4s cubic-bezier(.215,.61,.355,1)" : "transform .6s cubic-bezier(.645,.045,.355,1)";
+  s.style.transform = open ? `translateY(${dy}px)` : "translateY(105%)";
+  const a = open ? Math.max(0, 1 - dy / s.offsetHeight) : 0;
+  sc.style.transition = drag ? "none" : "opacity .4s"; sc.style.opacity = .36 * a; sc.style.opacity = open ? .12 : 0;
+  if (open && !drag) { const at = $("body").querySelector(".at"); if (at) $("body").scrollTop = at.offsetTop - 120; }
+}
+{ let y0 = null, dy = 0; const h = $("grab");
+  let sc = null;
+  h.onpointerdown = e => { if (e.target.closest("button")) return; const l = e.target.closest(".ph"); if (l) { sc = [l, e.clientY]; h.setPointerCapture(e.pointerId); return; } y0 = e.clientY; dy = 0; h.setPointerCapture(e.pointerId); };
+  const big = b => { $("sheet").style.height = b ? "85dvh" : ""; $("sheet")._b = b; };
+  h.onpointermove = e => { if (sc) { sc[0].scrollTop += sc[1] - e.clientY; sc[1] = e.clientY; return; } if (y0 == null) return; dy = e.clientY - y0; if (dy > 0 && !$("sheet")._b) sheet(true, dy, true); };
+  h.onpointerup = () => { if (sc) { sc = null; return; } if (y0 == null) return; y0 = null;
+    if (dy < -40) big(true); else if ($("sheet")._b) { if (dy > 60) big(false); } else sheet(dy < 90, 0); if (!$("sheet")._b && dy >= 90) big(false); };
+  $("scrim").onclick = () => sheet(false); }
+// mouse wheel / trackpad: vertical wheel scrolls the horizontal strip
+$("strip").addEventListener("wheel", e => { if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; e.preventDefault(); $("strip").scrollBy({left: e.deltaY, behavior: "auto"}); }, {passive: false});
+$("strip").onscroll =() => requestAnimationFrame(() => upd(true));
+$("strip").onclick = e => { const b = e.target.closest("button"); if (!b) return;
+  if (+b.dataset.i === cur) sheet(true); else b.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
+$("tabs").onclick = e => { const b = e.target.closest("button"), sp = $("strip"); if (!b) return;
+  if (pin) { pin = null; render(); } // pinned far-away run: re-centre on now first
+  if (sp._now < 0) return;
+  const t = sp.children[Math.min(Math.max(sp._now + +b.dataset.t, 0), sp.children.length - 1)]; if (t) t.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
+$("ln").onclick = e => { const l = e.target.closest("button")?.dataset.l; if (l) { st.line = l; pin = null; render(); } };
+$("dr").onclick = e => { const d = e.target.closest("button")?.dataset.d; if (d) { st.dir = +d; pin = null; render(); } };
+$("stl").onclick = e => { const b = e.target.closest("button"); if (b) { st.stn = b.dataset.s; pin = null; render(); } };
+$("flip").onclick = () => { const ds = Object.keys(ends(st.line)).sort(); st.dir = +ds[(ds.indexOf(String(st.dir)) + 1) % ds.length]; pin = null; render(); };
+const flt = () => { const q = $("sq").value.trim().toLowerCase(); for (const b of $("stl").children) b.style.display = !q || (b.textContent + b.dataset.s).toLowerCase().includes(q) ? "" : "none"; };
+$("sq").oninput = flt;
+$("loc").onclick = () => { const b = $("loc"); if (!navigator.geolocation) { b.textContent = "No location"; return; } b.textContent = "Locating…";
+  navigator.geolocation.getCurrentPosition(p => { b.textContent = "📍 Nearest"; let best, d0 = 1e9; for (const x of $("stl").children) { const q = N.pos && N.pos[x.dataset.s]; if (!q) continue; const d = (q[0] - p.coords.latitude) ** 2 + ((q[1] - p.coords.longitude) * .9997) ** 2; if (d < d0) { d0 = d; best = x.dataset.s; } } if (best) { st.stn = best; pin = null; $("sq").value = ""; render(); } },
+    () => { b.textContent = "Location denied"; }, { timeout: 8000, maximumAge: 60000 }); };
+$("srt").onclick = () => { byCode = !byCode; render(); };
+$("cfg").onclick =() => { step = 1; render(); };
+$("go").onclick = () => { st.ok = 1; step = "app"; render(); };
+$("start").addEventListener("click", e => { const b = e.target.closest("[data-back]"); if (b) { step = +b.dataset.back; render(); } });
+$("ln").addEventListener("click", e => { if (e.target.closest("button")) { step = 2; render(); } });
+$("dr").addEventListener("click", e => { if (e.target.closest("button")) { step = 3; render(); const b = $("stl").querySelector(".on"); if (b) $("stl").scrollTop = b.offsetTop - 160; } });
+$("q").oninput = () => { const q = $("q").value.trim().replace(/^0+(?=\d)/, "").toUpperCase(); if (!S) return; if (!q) { $("q").style.outline = ""; return; }
+  const t = S.trips.find(t => t.line === st.line && t.dir === st.dir && String(t.trn).toUpperCase() === q && t.stops.some(x => x[0] === st.stn)); $("q").style.outline = t ? "" : "2px solid #e5484d"; if (!t) return;
+  const k = days().findIndex(d => d.act.has(t.service)); if (k < 0) { $("q").style.outline = "2px solid #e5484d"; return; } // not running in the days shown
+  pin = t.id + "|" + Math.max(k, 0); render(); };
+(async () => {
+  try { [S, N] = await Promise.all(["schedule.json", "names.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }))); }
+  catch (e) { $("start").innerHTML = `<p class="empty">Couldn't load data (${e.message}).</p>`; return; }
+  render();
+  setTimeout(() => { step = st.ok ? "app" : 1; render(); }, 1000); // splash
+})();
+</script>
+</body>
+</html>
