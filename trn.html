@@ -141,6 +141,7 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 #start h1{font-size:32px;font-weight:800;letter-spacing:-.03em}
 #ln{display:flex;flex-direction:column;gap:8px;padding:0 16px;overflow-y:auto}
 #start #ln button{height:auto;min-height:64px;flex:none;flex-direction:row;align-items:center;justify-content:flex-start;gap:16px;padding:10px 16px 10px 10px;border-radius:18px;background:var(--card);color:var(--ink);box-shadow:none;overflow:visible}
+#start #ln img{height:56px;flex:none}
 #start #ln b{flex:none;min-width:84px;padding:9px 0;border-radius:14px;background:var(--c);color:#fff;text-align:center;font-size:22px;font-weight:800;letter-spacing:-.01em}
 #start #ln span{font-size:17px;font-weight:600;opacity:1}
 #ln button.on{box-shadow:inset 0 0 0 2px var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card))}
@@ -211,7 +212,7 @@ function render() {
   st.line = LINES.includes(st.line) ? st.line : "CCL";
   document.documentElement.style.setProperty("--lc", N.colors[st.line]);
   const e = ends(st.line), dirs = Object.keys(e).sort(); if (!dirs.includes(String(st.dir))) st.dir = +dirs[0];
-  $("ln").innerHTML = LINES.map(l => `<button data-l="${l}" class="${l === st.line ? "on" : ""}" style="--c:${N.colors[l]}"><b>${l}</b><span>${LN[l]}</span></button>`).join("");
+  $("ln").innerHTML = LINES.map(l => `<button data-l="${l}" class="${l === st.line ? "on" : ""}" style="--c:${N.colors[l]}"><img src="caplets/lines/${l}.svg" alt="${l}"><span>${LN[l]}</span></button>`).join("");
   $("dr").innerHTML = dirs.map(d => { const r = S.trips.filter(t => t.line === st.line && t.dir === +d).reduce((a, t) => t.stops.length > a.stops.length ? t : a);
     const [h, sub] = dname(st.line, d, e[d][0]); return `<button data-d="${d}" class="${+d === st.dir ? "on" : ""}"><span><b>${h}</b>${sub ? `<small>${sub}</small>` : ""}</span></button>`; }).join("");
   $("flip").innerHTML = `⇄ <span>${dlab(st.line, st.dir, e[st.dir][0])}</span>`; $("flip").hidden = dirs.length < 2;
