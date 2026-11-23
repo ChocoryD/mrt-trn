@@ -36,7 +36,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.3 "Plus Jakarta 
 #start.hide{transform:translateY(100%);pointer-events:none}
 #start h1{font-size:30px;margin:8px 20px 18px}
 .stp{display:none;flex:1;min-height:0;flex-direction:column;padding-top:22px}
-#start[data-step="0"] .s0,#start[data-step="1"] .s1,#start[data-step="2"] .s2,#start[data-step="3"] .s3{display:flex}
+#start[data-step="0"] .s0,#start[data-step="1"] .s1,#start[data-step="2"] .s2{display:flex}
 .s0{align-items:center;justify-content:center;gap:10px}
 .logo{font-size:84px;font-weight:900;letter-spacing:-2px;background:linear-gradient(90deg,#d42e12,#009645,#9900aa,#fa9e0d,#005ec4,#9d5b25);-webkit-background-clip:text;background-clip:text;color:transparent}
 .s0 p{margin:0;color:var(--mute)}
@@ -148,12 +148,6 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 #start #ln b{flex:none;min-width:84px;padding:9px 0;border-radius:14px;background:var(--c);color:#fff;text-align:center;font-size:22px;font-weight:800;letter-spacing:-.01em}
 #start #ln span{font-size:17px;font-weight:600;opacity:1}
 #ln button.on{box-shadow:inset 0 0 0 2px var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card))}
-#dr{display:flex;flex-direction:column;gap:12px;padding:0 16px}
-#start #dr button{flex:none;min-height:84px;height:auto;display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:18px 20px;border-radius:24px;background:var(--card);color:var(--ink);border:0;font:inherit;text-align:left;box-shadow:inset 0 0 0 2px transparent}
-#dr b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em}#dr small{display:block;margin-top:6px;font-size:14px;font-weight:600;color:var(--mute)}
-#dr em{display:flex;align-items:center;gap:8px;margin-top:10px;font-style:normal}#dr s{text-decoration:none;color:var(--mute);font-weight:700}
-#dr button>i{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:20px;background:var(--fill)}
-#dr button.on{background:color-mix(in srgb,var(--lc) 14%,var(--card));box-shadow:inset 0 0 0 2px var(--lc)}#dr .on>i{background:var(--lc);color:var(--on-lc,#fff)}
 .stl{background:none;border-radius:0;scrollbar-width:thin;scrollbar-color:var(--fill) transparent;display:flex;flex-direction:column;gap:8px}
 .stl button{flex:none;border:0;border-radius:18px;background:var(--card);padding:12px 14px;font-size:17px;font-weight:600}
 .stl .on{background:color-mix(in srgb,var(--lc) 16%,var(--card));box-shadow:inset 0 0 0 2px var(--lc);font-weight:800}
@@ -165,11 +159,10 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 <div id="start" data-step="0">
   <div class="stp s0"><div class="logo">TRN</div><p>MRT run tracker</p><div class="spin"></div></div>
   <div class="stp s1"><h1>Select line</h1><div class="top" id="ln"></div></div>
-  <div class="stp s2"><button class="back" data-back="1">‹ Line</button><h1>Select direction</h1><div class="seg" id="dr"></div></div>
-  <div class="stp s3"><button class="back" data-back="2">‹ Direction</button><h1>Select station</h1><div style="display:flex;gap:8px;margin:0 16px 10px"><input id="sq" placeholder="Search station or code" autocomplete="off" style="flex:1;min-width:0;height:44px;border:0;border-radius:22px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit"><button class="more" id="loc" style="margin:0;flex:none;width:auto;padding:0 14px;white-space:nowrap">📍 Nearest</button></div><button class="more" id="srt" style="margin:0 16px 10px;width:auto"></button><div class="stl" id="stl"></div><button class="more go" id="go">Start</button></div>
-  <div class="dots" id="dots"><b></b><b></b><b></b></div>
+  <div class="stp s2"><button class="back" data-back="1">‹ Line</button><h1>Select station</h1><div style="display:flex;gap:8px;margin:0 16px 10px"><input id="sq" placeholder="Search station or code" autocomplete="off" style="flex:1;min-width:0;height:44px;border:0;border-radius:22px;padding:0 16px;background:var(--card);color:var(--ink);font:inherit"><button class="more" id="loc" style="margin:0;flex:none;width:auto;padding:0 14px;white-space:nowrap">📍 Nearest</button></div><button class="more" id="srt" style="margin:0 16px 10px;width:auto"></button><div class="stl" id="stl"></div><button class="more go" id="go">Start</button></div>
+  <div class="dots" id="dots"><b></b><b></b></div>
 </div>
-<button id="cfg" aria-label="Change line, direction or station"></button>
+<button id="cfg" aria-label="Change line or station"></button>
 <div class="row"><input id="q" inputmode="numeric" autocomplete="off" placeholder="Jump to run no." aria-label="Jump to run number"><button id="flip" aria-label="Switch direction"></button></div>
 <div class="tabs" id="tabs"><i></i><button data-t="-1">Upcoming</button><button data-t="0">Now</button><button data-t="1">Passed</button></div>
 <div id="note"></div>
@@ -212,16 +205,12 @@ function dlab(line, d, z) {
   const t = S.trips.find(t => t.line === line && t.dir === +d && t.stops.length > 10), n = i => +t.stops[i][0].match(/\d+/)[0];
   return t && n(9) > n(10) ? "Clockwise" : "Anticlockwise";
 }
-const DN = {"Jurong East": "Northbound (NB)", "Marina South Pier": "Southbound (SB)", "Pasir Ris": "East Bound (EB)", "Tuas Link": "West Bound (WB)", "Punggol Coast": "North Bound (NB)", "HarbourFront": "South Bound (SB)", "Bukit Panjang": "Bukit Panjang Bound (BB)", "Expo": "Expo Bound (XB)", "Woodlands North": "Woodlands Bound (WB)", "Bayshore": "Changi Bound (CB)"};
-function dname(line, d, z) { if (line === "CCL") return [dlab(line, d) === "Clockwise" ? "Clockwise (OT)" : "Anti Clockwise (IT)", ""]; const n = nm(z); return DN[n] ? [DN[n], "To " + n] : ["To " + n, ""]; }
 function render() {
   if (!S) return;
   st.line = LINES.includes(st.line) ? st.line : "CCL";
   document.documentElement.style.setProperty("--lc", N.colors[st.line]); document.documentElement.style.setProperty("--on-lc", st.line === "CCL" ? "#000" : "#fff"); // white on CCL orange is ~2:1
   const e = ends(st.line), dirs = Object.keys(e).sort(); if (!dirs.includes(String(st.dir))) st.dir = +dirs[0];
   $("ln").innerHTML = LINES.map(l => `<button data-l="${l}" class="${l === st.line ? "on" : ""}" style="--c:${N.colors[l]}"><img src="caplets/lines/${l}.svg" alt="${l}"><span>${LN[l]}</span></button>`).join("");
-  $("dr").innerHTML = dirs.map(d => { const r = S.trips.filter(t => t.line === st.line && t.dir === +d).reduce((a, t) => t.stops.length > a.stops.length ? t : a);
-    const [h, sub] = dname(st.line, d, e[d][0]); return `<button data-d="${d}" class="${+d === st.dir ? "on" : ""}"><span><b>${h}</b>${sub ? `<small>${sub}</small>` : ""}</span></button>`; }).join("");
   $("flip").innerHTML = `⇄ <span>${dlab(st.line, st.dir, e[st.dir][0])}</span>`; $("flip").hidden = dirs.length < 2;
   const trips = S.trips.filter(t => t.line === st.line && t.dir === st.dir), long = trips.reduce((a, t) => t.stops.length > a.stops.length ? t : a, trips[0]);
   const codes = long.stops.map(x => x[0]); if (!codes.includes(st.stn)) st.stn = codes[codes.length >> 1];
@@ -239,21 +228,22 @@ function render() {
   for (const {k, act} of ds) for (const t of trips) if (act.has(t.service)) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) occ.push({t, at: t.stops[i][2] - 86400 * k, i, id: t.id + "|" + k}); }
   occ.sort((a, b) => a.at - b.at);
   let c = pin ? occ.findIndex(o => o.id === pin) : -1;
-  if (c < 0) { c = occ.findLastIndex(o => o.at <= secs); if (c < 0) c = 0; }
+  const nx = Math.max(0, occ.findIndex(o => o.at > secs) < 0 ? occ.length - 1 : occ.findIndex(o => o.at > secs));
+  if (c < 0) c = nx;
   const list = occ.slice(Math.max(0, c - 30), c + 31).reverse(), strip = $("strip"); // left = later runs, right = earlier
   strip.innerHTML = list.map((o, i) => `<button data-i="${i}"><b>${P(o.t.trn)}</b><span>${hm(o.at)}</span></button>`).join("");
   strip._o = list; strip._secs = secs; cur = -1;
-  strip._now = list.indexOf(occ[occ.findLastIndex(o => o.at <= secs)]);
+  strip._now = list.indexOf(occ[nx]);
   const b = strip.children[list.indexOf(occ[c])];
   quiet = Date.now() + 800;
   if (b) strip.scrollLeft = b.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2;
   upd(); try { localStorage.setItem("trn3", JSON.stringify(st)); } catch (e) {}
 }
-// keep times fresh: every 30 s and on returning to the tab, unless mid-gesture (act), in setup, or hidden; the centred run stays centred
+// keep times fresh: every 10 s and on returning to the tab, unless mid-gesture (act), in setup, or hidden; a run you moved off "next" stays pinned, otherwise the strip follows the next departure
 let act = 0;
 function refresh() { const sp = $("strip"); if (!S || step !== "app" || document.hidden || Date.now() - act < 5000) return;
-  const p = pin; if (cur >= 0 && (cur !== sp._now || document.body.classList.contains("open"))) pin = sp._o[cur].id; render(); pin = p; }
-setInterval(refresh, 30000); document.addEventListener("visibilitychange", refresh);
+  const p = pin; if (cur >= 0 && cur !== sp._now) pin = sp._o[cur].id; render(); pin = p; }
+setInterval(refresh, 10000); document.addEventListener("visibilitychange", refresh);
 $("body").addEventListener("scroll", () => act = Date.now());
 // continuous fisheye: size and fade follow distance from the centre
 let quiet = 0;
@@ -267,7 +257,7 @@ function upd(user) {
     if (d < bd) { bd = d; best = i; } });
   if (best !== cur && sp._now >= 0) { const t = Math.sign(best - sp._now); // list is reversed: higher index = earlier = passed
     $("tabs").firstChild.style.transform = `translateX(${(t + 1) * 100}%)`; [...$("tabs").children].slice(1).forEach(x => x.classList.toggle("on", +x.dataset.t === t)); }
-  if (best === cur) return; cur = best; clearTimeout(tm); tm = setTimeout(() => { info(sp._o[best], sp._secs); if (user && Date.now() > quiet) sheet(true); }, user ? 450 : 0); // pops up once you stop on a run
+  if (best === cur) return; cur = best; clearTimeout(tm); tm = setTimeout(() => { info(sp._o[best], sp._secs); }, user ? 450 : 0); // the sheet only opens when you tap the centred card
 }
 // run type from the whole run (all trips of one trn on one service day):
 // AM = withdrawn by noon, HD = half day (off by 17:00), PM = signs on after noon, FD = both peaks; LN = last trip leaves its terminus after ~21:30
@@ -331,20 +321,20 @@ $("tabs").onclick = e => { const b = e.target.closest("button"), sp = $("strip")
   if (sp._now < 0) return;
   const t = sp.children[Math.min(Math.max(sp._now + +b.dataset.t, 0), sp.children.length - 1)]; if (t) t.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"}); };
 $("ln").onclick = e => { const l = e.target.closest("button")?.dataset.l; if (l) { st.line = l; pin = null; render(); } };
-$("dr").onclick = e => { const d = e.target.closest("button")?.dataset.d; if (d) { st.dir = +d; pin = null; render(); } };
 $("stl").onclick = e => { const b = e.target.closest("button"); if (b) { st.stn = b.dataset.s; pin = null; render(); } };
 $("flip").onclick = () => { const ds = Object.keys(ends(st.line)).sort(); st.dir = +ds[(ds.indexOf(String(st.dir)) + 1) % ds.length]; pin = null; render(); };
 const flt = () => { const q = $("sq").value.trim().toLowerCase(); for (const b of $("stl").children) b.style.display = !q || (b.textContent + b.dataset.s).toLowerCase().includes(q) ? "" : "none"; };
 $("sq").oninput = flt;
-$("loc").onclick = () => { const b = $("loc"); if (!navigator.geolocation) { b.textContent = "No location"; return; } b.textContent = "Locating…";
-  navigator.geolocation.getCurrentPosition(p => { b.textContent = "📍 Nearest"; let best, d0 = 1e9; for (const x of $("stl").children) { const q = N.pos && N.pos[x.dataset.s]; if (!q) continue; const d = (q[0] - p.coords.latitude) ** 2 + ((q[1] - p.coords.longitude) * .9997) ** 2; if (d < d0) { d0 = d; best = x.dataset.s; } } if (best) { st.stn = best; pin = null; $("sq").value = ""; render(); } },
-    () => { b.textContent = "Location denied"; setTimeout(() => b.textContent = "📍 Nearest", 3000); }, { timeout: 8000, maximumAge: 60000 }); };
+function locate(silent) { const b = $("loc"); if (!navigator.geolocation) { if (!silent) b.textContent = "No location"; return; } if (!silent) b.textContent = "Locating…";
+  navigator.geolocation.getCurrentPosition(p => { if (!silent) b.textContent = "📍 Nearest"; let best, d0 = 1e9; for (const x of $("stl").children) { const q = N.pos && N.pos[x.dataset.s]; if (!q) continue; const d = (q[0] - p.coords.latitude) ** 2 + ((q[1] - p.coords.longitude) * .9997) ** 2; if (d < d0) { d0 = d; best = x.dataset.s; } } if (best && best !== st.stn) { st.stn = best; pin = null; $("sq").value = ""; render(); } },
+    () => { if (!silent) { b.textContent = "Location denied"; setTimeout(() => b.textContent = "📍 Nearest", 3000); } }, { timeout: 8000, maximumAge: 60000 }); }
+$("loc").onclick = () => locate();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) locate(true); });
 $("srt").onclick = () => { byCode = !byCode; render(); };
 $("cfg").onclick =() => { step = 1; render(); };
 $("go").onclick = () => { st.ok = 1; step = "app"; render(); };
 $("start").addEventListener("click", e => { const b = e.target.closest("[data-back]"); if (b) { step = +b.dataset.back; render(); } });
-$("ln").addEventListener("click", e => { if (e.target.closest("button")) { step = 2; render(); } });
-$("dr").addEventListener("click", e => { if (e.target.closest("button")) { step = 3; render(); const b = $("stl").querySelector(".on"); if (b) $("stl").scrollTop = b.offsetTop - 160; } });
+$("ln").addEventListener("click", e => { if (e.target.closest("button")) { step = 2; render(); const b = $("stl").querySelector(".on"); if (b) $("stl").scrollTop = b.offsetTop - 160; locate(true); } });
 $("q").oninput = () => { const q = $("q").value.trim().replace(/^0+(?=\d)/, "").toUpperCase(); if (!S) return; if (!q) { $("q").style.outline = ""; return; }
   const ds = days(), c = []; // every pass of this run at the station in the days shown; jump to the next one, else the latest
   for (const t of S.trips) if (t.line === st.line && t.dir === st.dir && String(t.trn).toUpperCase() === q) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) for (const d of ds) if (d.act.has(t.service)) c.push({id: t.id + "|" + d.k, at: t.stops[i][2] - 86400 * d.k}); }
@@ -353,7 +343,7 @@ $("q").oninput = () => { const q = $("q").value.trim().replace(/^0+(?=\d)/, "").
 (async () => {
   try { [S, N] = await Promise.all(["schedule.json", "names.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }))); }
   catch (e) { $("start").innerHTML = `<p class="empty">Couldn't load data (${e.message}).</p><button class="more" style="margin:0 16px;width:auto" onclick="location.reload()">Retry</button>`; return; }
-  step = st.ok ? "app" : 0; render();
+  step = st.ok ? "app" : 0; render(); locate(true);
   if (!st.ok) setTimeout(() => { step = 1; render(); }, 1000); // splash on first run only
 })();
 </script>
