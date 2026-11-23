@@ -172,7 +172,7 @@ body.open .wheel .strip{transform:translateY(calc((16px + env(safe-area-inset-bo
 <button id="cfg" aria-label="Change line, direction or station"></button>
 <div class="row"><input id="q" inputmode="numeric" autocomplete="off" placeholder="Jump to run no." aria-label="Jump to run number"><button id="flip" aria-label="Switch direction"></button></div>
 <div class="tabs" id="tabs"><i></i><button data-t="-1">Upcoming</button><button data-t="0">Now</button><button data-t="1">Passed</button></div>
-<div id="note" hidden>Timetable may be out of date</div>
+<div id="note"></div>
 <div class="wheel"><div class="strip" id="strip"></div></div>
 <div id="scrim"></div>
 <div id="sheet"><div id="grab"><i></i><b id="ttl"></b></div><div id="body"></div></div>
@@ -232,7 +232,10 @@ function render() {
   $("cfg").innerHTML = `${cap(st.stn)}<span><b>${nm(st.stn)}</b><small>${st.line === "CCL" ? dlab(st.line, st.dir) : nm(long.stops[0][0]) + " → " + nm(long.stops.at(-1)[0])}</small><u>${LN[st.line]}</u></span><em>⌄</em>`;
   [...$("dots").children].forEach((d, i) => d.classList.toggle("on", i + 1 === step));
   $("start").dataset.step = step;$("start").classList.toggle("hide", step === "app");
-  const ds = days(), secs = ds[0].now, occ = []; $("note").hidden = !stale;
+  const ds = days(), secs = ds[0].now, occ = [];
+  // today's timetable for this line: WD = Mon-Fri, WE = Sat, PH = Sun and public holidays; SPECIAL = extra/changed runs
+  const tt = [...ds[0].act].filter(id => /_CCL/.test(id) === (st.line === "CCL")), TT = {WD: "Weekday", WE: "Saturday", PH: "Sunday / public holiday"};
+  $("note").textContent = ([...new Set(tt.map(id => TT[id.split("_")[1]]))].join(" + ") || "No service") + " timetable" + (tt.some(id => /SPECIAL/.test(id)) ? " · special runs" : "") + (stale ? " · may be out of date" : "");
   for (const {k, act} of ds) for (const t of trips) if (act.has(t.service)) { const i = t.stops.findIndex(x => x[0] === st.stn); if (i >= 0) occ.push({t, at: t.stops[i][2] - 86400 * k, i, id: t.id + "|" + k}); }
   occ.sort((a, b) => a.at - b.at);
   let c = pin ? occ.findIndex(o => o.id === pin) : -1;
